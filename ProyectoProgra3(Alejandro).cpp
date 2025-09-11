@@ -107,50 +107,77 @@ que se especifican dentro de cada metodo. Implementar el metodo limpiar en la op
 para liberar toda la memoria al terminar de trabajar.
 
 */
-void menu(){
 
-}
+void menu(Nodo*& cabeza){
+    int opc;
+    char placa[5];
+    string modelo;
+    int hora_ingreso;
+
+    do {
+        system("clear"); // Limpia la pantalla
+
+        cout << "Seleccione una de las siguientes opciones" << endl;
+        cout << "1. Lista de vehiculos estacionados" << endl;
+        cout << "2. Agregar un vehiculo" << endl;
+        cout << "3. Quitar un vehiculo del estacionamiento" << endl;
+        cout << "4. Buscar un vehiculo" << endl;
+        cout << "5. Salir" << endl;
+        cout << "Escriba la Opcion que desea: ";
+        cin >> opc;
+
+        switch (opc) {
+            case 1:
+                Mostrar(cabeza);
+                system("pause"); // Pausa para que el usuario pueda ver la lista
+                break;
+
+            case 2:
+                cout << "Ingrese la placa del vehiculo (max 4 caracteres): ";
+                cin >> placa;
+                cout << "Ingrese el modelo: ";
+                cin >> modelo;
+                cout << "Ingrese la hora de ingreso: ";
+                cin >> hora_ingreso;
+                Agregar(cabeza, placa, modelo, hora_ingreso);
+                cout << "Vehiculo agregado exitosamente." << endl;
+                system("pause");
+                break;
+            
+            case 3:
+                cout << "Ingrese la placa del vehiculo a salir: ";
+                cin >> placa;
+                Salida(cabeza, placa);
+                cout << "Vehiculo retirado (si existe)." << endl;
+                system("pause");
+                break;
+
+            case 4:
+                cout << "Ingrese la placa del vehiculo a buscar: ";
+                cin >> placa;
+                MostrarElemento(cabeza, placa);
+                system("pause");
+                break;
+
+            case 5:
+                limpiar(cabeza); // Llama a limpiar antes de salir
+                cout << "Saliendo del programa y liberando memoria." << endl;
+                exit(0);
+                break;
+
+            default:
+                cout << "Opcion seleccionada invalida, por favor intente de nuevo." << endl;
+                system("pause");
+                break;
+        }
+    } while (opc != 5);
+};
 
 
 
 int main(){
-
-}
-
-
-
-
-
-
-
-/*
-
-
-
-
-
-
-
-
-
-
-
-Denis si lees esto, fok you >:)
-
-//borrar esto despues//
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*/
+    Nodo* cabeza = nullptr; // Declara e inicializa la cabeza de la lista
+    menu(cabeza); // Pasa la cabeza al menú
+    return 0;
+};
+system("clear");
