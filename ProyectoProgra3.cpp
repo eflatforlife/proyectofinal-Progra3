@@ -2,9 +2,12 @@
 #include<string>
 #include <cstdlib>
 #include <cstring>
+#include <list>
+#include <algorithm> 
 
 using namespace std;
 
+std::list<int> estacionamientos;
 
 //proyecto de registro de vehiculos en un estacionamiento/
 
@@ -23,12 +26,22 @@ Agrega el elemento en la lista, se utiliza new
 
 */
 
+bool contiene(const list<int>& lst, int valor) {
+    for (int element : lst) {
+        if (element == valor) {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 void Agregar(Nodo*& cabeza, char plate[6], string model, int hour, int parking)
 {
     Nodo* nuevo = new Nodo();
+    
 
+    //me tomo toda la noche encontrar este error porfavor ayudenme X_X//
     strcpy_s(nuevo->placa, plate);
 
 
@@ -57,28 +70,33 @@ void Mostrar(Nodo*& cabeza) {
 
     if (actual == nullptr) {
         cout << "La lista esta vacia." << endl;
+        cout << "No hay mas elementos..." << endl;
     }
 
     while (actual != nullptr) {
-        cout << actual->num_parqueo << " -> " << actual->placa << " -> " << actual->modelo << " -> " << actual->hora_ingreso << " \n";
+        cout << "Parqueo: " << actual->num_parqueo << " -> " << " Placa: " << actual->placa << " -> " << actual->modelo << " -> " << actual->hora_ingreso << " \n";
         actual = actual->siguiente;
     }
 
 
     cout << "No hay mas elementos..." << endl;
-
 }
 
 
 void MostrarElemento(Nodo*& cabeza, int parqueo) {
     Nodo* seleccion = cabeza;
+    bool encontrado = false;
 
-    if (seleccion->num_parqueo == parqueo) {
-        cout << seleccion->num_parqueo << " -> " << seleccion->placa << " -> " << seleccion->modelo << " -> " << seleccion->hora_ingreso << " \n";
 
+    while (seleccion != nullptr) {
+        if (seleccion->num_parqueo == parqueo) {
+            cout << "Vehiculo Encontrado." << endl;
+            cout << seleccion->num_parqueo << " -> " << seleccion->placa << " -> " << seleccion->modelo << " -> " << seleccion->hora_ingreso << " \n";
+
+        }
     }
-    else {
-        cout << "No se encuentra el vehiculo :(";
+    if (!encontrado) {
+        cout << "No se encuentra el vehuiculo T_T"<<endl;
     }
 
 }
@@ -111,27 +129,35 @@ Salida de los vehiculo
 
 */
 
-bool Salida(Nodo*& cabeza, int parqueo) {
-
+void Salida(Nodo*& cabeza, int parqueo) {
     Nodo* actual = cabeza;
-    Nodo* antes = nullptr;
+    Nodo* anterior = nullptr;
+    bool eliminado = false;
 
-    while (actual != nullptr)
+    while (actual != nullptr) {
         if (actual->num_parqueo == parqueo) {
-            Nodo* temp = actual;
-            delete temp;
+            if (anterior == nullptr) {
+                // El nodo a eliminar es la cabeza
+                cabeza = actual->siguiente;
+            }
+            else {
+                // El nodo a eliminar está en medio o al final
+                anterior->siguiente = actual->siguiente;
+            }
+            delete actual; // Libera la memoria
+            eliminado = true;
+            cout << "Vehiculo retirado exitosamente." << endl;
+            
 
-
-            return true;
             break;
         }
-        else {
-            cout << "No se encuentra en la lista." << endl;
-			return false;
-			break;
-        }
+        anterior = actual;
+        actual = actual->siguiente;
+    }
 
-
+    if (!eliminado) {
+        cout << "No se encuentra el vehiculo en la lista." << endl;
+    }
 }
 
 
@@ -176,54 +202,60 @@ void menu(Nodo*& cabeza) {
             break;
 
         case 2:
-
             /*Validaciones adecuadas de entrada de datos
-                    Esta seccion valida que:
-                        Las placas sean de maximo 5 caracteres
-                        La hora de ingreso sea un int
-            */
+    Esta seccion valida que:
+        Las placas sean de maximo 5 caracteres
+        La hora de ingreso sea un int
+*/
+
+            cin.getline(blanco, 1); //getline lee el /n del cin pasado, entonces esta linea sirve solo para comerse ese /n
             cout << "Ingrese la placa: ";
 
-            cin.getline(placa, 6);
+            cin.getline(placa, 6); //getline lee la placa, y le sume un '/0'. De este manera, podemos encontrar cuantos caracteres han sido ingresados
+
+            //este while asegura que el usuario no ingrese mas de 5 caracteres para la placa
+
+            while ((cin.fail() && (strlen(placa) == 5 || strlen(placa) == 0))) {
+                cout << "Ingreso mas de 5 caracteres. Intente otravez.";
+                cin.clear();
+                cin.ignore(10000, '\n');
+                cout << "Ingrese la placa: ";
+                cin.getline(placa, 6);
+            }
+
+
 
             cout << "Ingrese el modelo: ";
-            cin >> modelo;
+            getline(cin, modelo);
 
-            //Este while asegura que el usuario no ingrese un valor distinto a un Int para la hora de ingreso
-            cout << "Ingrese la hora de ingreso: ";
-
-            while (!(cin >> hora_ingreso) || (hora_ingreso < 0 || hora_ingreso>23)) { // Si hora_ingreso no es un int, corre el while. Solo se permitira ingresar hasta que sea un int hora_ingreso
-                cout << "Ingreso un valor que no es permitido. Intente otravez." << endl;
+            cout << "Ingrese la hora de ingreso (0-23): ";
+            while (!(cin >> hora_ingreso) || (hora_ingreso < 0 || hora_ingreso > 23)) {
+                cout << "Ingreso un valor que no es permitido. Intente otra vez." << endl;
                 cin.clear();
-                cin.ignore(10000, '\n');
-                cin >> hora_ingreso;
+                cin.ignore(1000, '\n');
+                cout << "Ingrese la hora de ingreso: ";
             }
 
-            cout << "Ingrese el numero de parqueo: ";
-
-            while (!(cin >> parqueo) || (parqueo < 1 || parqueo>999)) {
-                cout << "No se puede ingresar, valor fuera de rango :(" << endl;
+            cout << "Ingrese el numero de parqueo (1-999): ";
+            while (!(cin >> parqueo) || (parqueo < 1 || parqueo > 999) || contiene(estacionamientos, parqueo) == true) {
+                cout << "No se puede ingresar, valor fuera de rango o ha ingresado un estacionamiento ya ingresado" << endl;
                 cin.clear();
-                cin.ignore(10000, '\n');
+                cin.ignore(1000, '\n');
                 cout << "Ingrese el numero de parqueo: ";
-                cin >> parqueo;
             }
+
+			estacionamientos.push_back(parqueo);
 
             Agregar(cabeza, placa, modelo, hora_ingreso, parqueo);
             cout << "Vehiculo agregado exitosamente." << endl;
             system("pause");
             break;
-
         case 3:
             cout << "Ingrese el numero de parqueo del vehiculo a salir: ";
             cin >> parqueo;
-
-            if (Salida(cabeza, parqueo)) {
-                cout << "Vehiculo retirado (si existe)." << endl;
-            }
+            Salida(cabeza, parqueo);
             system("pause");
             break;
-
         case 4:
             cout << "Ingrese el numero de parqueo del vehiculo a buscar: ";
             cin >> parqueo;
@@ -234,7 +266,6 @@ void menu(Nodo*& cabeza) {
         case 6:
             limpiar(cabeza); // Llama a limpiar antes de salir
             cout << "Saliendo del programa" << endl;
-            cout << "BYE OWO." << endl;
             exit(0);
             break;
 
@@ -275,7 +306,12 @@ int main() {
 
 
     Nodo* cabeza = nullptr; // Declara e inicializa la cabeza de la lista
+    char s[6];
     menu(cabeza); // Pasa la cabeza al menú
+    
+    Agregar(cabeza, s, "modelo", 0, 0);
+    
     system("cls");
     return 0;
 }
+
