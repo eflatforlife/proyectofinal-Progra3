@@ -92,8 +92,9 @@ void MostrarElemento(Nodo*& cabeza, int parqueo) {
         if (seleccion->num_parqueo == parqueo) {
             cout << "Vehiculo Encontrado." << endl;
             cout << seleccion->num_parqueo << " -> " << seleccion->placa << " -> " << seleccion->modelo << " -> " << seleccion->hora_ingreso << " \n";
-
+			encontrado=true;
         }
+        break;
     }
     if (!encontrado) {
         cout << "No se encuentra el vehuiculo T_T"<<endl;
@@ -314,4 +315,5 @@ int main() {
     system("cls");
     return 0;
 }
+
 
